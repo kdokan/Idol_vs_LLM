@@ -16,14 +16,28 @@
 ### 背景
 
 - 社外ハンズオンに出た際に、文章をベクトル化(Embedding)してコサイン類似度でポジネガやラベル付与を判別するというのが自分の引き出しになかった。
-- さらに、LLM as a judgeをすることで、
+- さらに、LLM as a judgeで上記判別の確認したり理由を書いてもらうということの引き出しに現状の自分になかった。
+- 上記二つやってみておくというのと
 
 ### やってみたこと
 
+アイドルの歌詞から夏曲とカテゴライズできるものを判定してみる。
 
 ### やってみての所感
 
-
+- ベクトル化→コサイン類似度で判別とすることで、コサイン類似度の大きい順に並べて確認するという確認の仕方ができるようになってチェック・確認がすごくしやすい
+- ベクトル化→コサイン類似度のアプローチだと複数のニュアンスが入っている場合判別が怪しくなる時があるのかも？なので、LLM as a judgeは下流の過程でやっておくのが良さそう。
+    - 例えば、今回だと春夏秋冬すべてが歌の中に入っていても夏判定されてしまうとか...
+- LLM as a judgeであてはまり度の理由を書かせることで、各文章が振り分けられた理由まで作成が完了して楽
+- LLM as a judgeの結果を出力する際にJSON形式で出力するようにプロンプトを気をつけるだけでその後のハンドリングめっちゃ楽
+<pre><code>
+# 例
+ 1. 次のようなJSON形式で出力してください：
+    {{
+    "score": 数値（0.0〜1.0）, 
+    "reason": "夏っぽさに関する説明"
+    }}
+</code></pre>
 
 
 ## 分析STEP
@@ -39,8 +53,9 @@
 
 ### Embeddingsモデルで歌詞をベクトル化し、夏というワードのコサイン類似度を見る。
 
+今回はOpenAI APIのEmbeddingsモデルを使って、ベクトル化→コサイン類似度を計測してみた。
 
-ベクトル化するアプローチとして、word2vecとかもあるけどもこれは単語に対してしかできないので文章に対してできるのはLLMの強み
+参照：[https://github.com/gh640/openai-models-ja](https://github.com/gh640/openai-models-ja)
 
 <pre><code>
 #%%
@@ -72,6 +87,8 @@ res_embedding = datasets.sort_values("Similarity", ascending=False)
 </code></pre>
 
 ### LLM as a judge
+
+LLM as a judgeでも、歌詞が夏っぽいか？を判定し、先ほどのLLM as a judgeの結果と見比べてみた。
 
 <pre><code>
 # 全アイドルLLM as a Judge実行 -----------------------------------
@@ -111,3 +128,27 @@ for i in range(len(res_embedding)):
 </code></pre>
 
 [https://qiita.com/t-hashiguchi/items/06222acd1643bc209b44](https://qiita.com/t-hashiguchi/items/06222acd1643bc209b44)
+
+
+## 結果
+
+### 両方のアプローチで夏曲判定された曲
+
+多分伝わらないけども、めっちゃくちゃ納得感のある結果になっている。
+
+![images1](images/bothflag_summersong.png)
+
+### 片方のアプローチで夏曲判定された曲
+
+- オレンジ：ベクトル化→コサイン類似度のアプローチ
+- 青：LLM as a judge
+
+正直、LLM as a judgeの判断の方が納得感ある。<br>
+オレンジの方は、曲の一部に夏っぽい要素が少しでもあったら拾ってしまっている感じがある。<br>
+なので、分類はベクトル化→コサイン類似度でやってLLM as a judgeで確認するが一番よさそう。
+
+![images2](images/notbothflag_summersong.png)
+
+
+
+
