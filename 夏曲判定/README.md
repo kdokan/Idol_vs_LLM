@@ -4,12 +4,26 @@
 ## 目次
 
 - [やったこと・背景](##やったこと・背景)
+    - [背景](#背景)
+    - [やってみたこと](やってみたこと)
 - [分析STEP](#分析STEP)
     - [3アイドルの歌詞をスクレイピングする。](#3アイドルの歌詞をスクレイピングする。)
     - [Embeddingsモデルで歌詞をベクトル化し、夏というワードのコサイン類似度を見る。](#Embeddingsモデルで歌詞をベクトル化し、夏というワードのコサイン類似度を見る。)
     - [LLM as a judge](#llm-as-a-judge)
     
 ## やったこと・背景
+
+### 背景
+
+- 社外ハンズオンに出た際に、文章をベクトル化(Embedding)してコサイン類似度でポジネガやラベル付与を判別するというのが自分の引き出しになかった。
+- さらに、LLM as a judgeをすることで、
+
+### やってみたこと
+
+
+### やってみての所感
+
+
 
 
 ## 分析STEP
@@ -58,4 +72,42 @@ res_embedding = datasets.sort_values("Similarity", ascending=False)
 </code></pre>
 
 ### LLM as a judge
+
+<pre><code>
+# 全アイドルLLM as a Judge実行 -----------------------------------
+for i in range(len(res_embedding)):
+    Lyric = res_embedding.iloc[i]["Lyric"]
+
+    model = "gpt-4o"
+    prompt = f"""
+    あなたは、歌詞の内容を元に「夏っぽいかどうか」を判定するスペシャリストです。
+    次のルールに従って結果を出力してください。
+
+    1. 次のようなJSON形式で出力してください：
+    {{
+    "score": 数値（0.0〜1.0）, 
+    "reason": "夏っぽさに関する説明"
+    }}
+
+    2. "score" は夏らしさのスコアを 0〜1 の範囲でNumericに出力してください。
+    0 は夏とまったく関係ない、1 は非常に夏らしいことを意味します。
+
+    以下が歌詞です：
+
+    {Lyric}
+    """
+
+    response = openai.chat.completions.create(
+        model = model,
+        messages = [{"role":"user","content":prompt}]
+    )
+    content = response.choices[0].message.content.strip()
+    # コードブロックを外す処理
+    if content.startswith("```") and content.endswith("```"):
+        content = "\n".join(content.split("\n")[1:-1]).strip()
+    result = json.loads(content)
+    res_embedding.iloc[i, res_embedding.columns.get_loc("score")] = result["score"]
+    res_embedding.iloc[i, res_embedding.columns.get_loc("reason")] = result["reason"]
+</code></pre>
+
 [https://qiita.com/t-hashiguchi/items/06222acd1643bc209b44](https://qiita.com/t-hashiguchi/items/06222acd1643bc209b44)
