@@ -13,8 +13,10 @@
 - 3/29 わーすた@LINE CUBE SHIBUYA
 - 4/29 CANDY TUNE@東京国際フォーラムA
 - 4/30 対バン(JamsCollection/わーすた)@豊洲PIT
+- 5/5 歌舞伎町UP GATE↑↑ 2025(JamsCollection/わーすた)
 - 5/17 JamsCollection@日比谷野外音楽堂
 - 6/7 ≠ME@ぴあアリーナMM
+- 6/18 JamsCollection@ヒューリックホール東京
 - 6/26 わーすた@SHIBUYA PREASURE PREASURE
 - 7/12 わーすた@秋葉原
 - 7/21 ≠ME@代々木体育館
