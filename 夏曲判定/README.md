@@ -10,6 +10,7 @@
     - [3アイドルの歌詞をスクレイピングする。](#3アイドルの歌詞をスクレイピングする。)
     - [Embeddingsモデルで歌詞をベクトル化し、夏というワードのコサイン類似度を見る。](#Embeddingsモデルで歌詞をベクトル化し、夏というワードのコサイン類似度を見る。)
     - [LLM as a judge](#llm-as-a-judge)
+- [結果](#結果)
     
 ## やったこと・背景
 
@@ -88,7 +89,7 @@ res_embedding = datasets.sort_values("Similarity", ascending=False)
 
 ### LLM as a judge
 
-LLM as a judgeでも、歌詞が夏っぽいか？を判定し、先ほどのLLM as a judgeの結果と見比べてみた。
+LLM as a judgeでも、歌詞が夏っぽいか？を判定し、先ほどの結果と見比べてみた。
 
 <pre><code>
 # 全アイドルLLM as a Judge実行 -----------------------------------
